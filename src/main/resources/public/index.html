@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JavalinJoe — Coffee Orders</title>
+  <style>
+    :root { --bg:#0f172a; --panel:#111827; --muted:#9ca3af; --text:#e5e7eb; --accent:#22c55e; --danger:#ef4444; --border:#1f2937 }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:linear-gradient(180deg,#0b1022,#0f172a 20%,#0b1022 100%) fixed; color:var(--text); }
+    header { padding:24px; border-bottom:1px solid var(--border); position:sticky; top:0; backdrop-filter:saturate(140%) blur(6px); background:rgba(15,23,42,.7); }
+    h1 { margin:0; font-size:20px; letter-spacing:.3px; }
+    main { max-width:1024px; margin: 24px auto 80px; padding: 0 16px; display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
+    .card { background:linear-gradient(180deg,#0b1226,#0c1222); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03); }
+    .card h2 { margin:0 0 12px; font-size:16px; color:#f8fafc; }
+    label { display:block; font-size:12px; color:var(--muted); margin:10px 0 6px; }
+    input, select { width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#0a0f1f; color:var(--text); outline:none; }
+    input:focus, select:focus { border-color:#334155; box-shadow:0 0 0 3px rgba(51,65,85,.35); }
+    button { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:999px; border:1px solid var(--border); background:#0b1226; color:var(--text); cursor:pointer; }
+    button.primary { background: linear-gradient(180deg, #16a34a, #16a34a 55%, #15803d); border-color:#16a34a; color:white; }
+    button.danger { background: linear-gradient(180deg, #ef4444, #dc2626 60%, #b91c1c); border-color:#ef4444; color:white; }
+    .row { display:flex; gap:8px; }
+    .row > * { flex:1; }
+    .muted { color: var(--muted); font-size:12px; }
+    pre { white-space:pre-wrap; word-wrap:break-word; background:#0a0f1f; border:1px solid var(--border); padding:12px; border-radius:10px; max-height:260px; overflow:auto; }
+    .footer { max-width:1024px; margin: 12px auto 32px; padding: 0 16px; color:var(--muted); font-size:12px; }
+    .endpoint { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; color:#a3e635; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>JavalinJoe — Coffee Orders Frontend</h1>
+    <div class="muted">Uses the API at <span class="endpoint">http://localhost:7070</span></div>
+  </header>
+
+  <main>
+    <section class="card" id="create-card">
+      <h2>Place a new order</h2>
+      <label for="customerName">Customer name</label>
+      <input id="customerName" placeholder="Ada Lovelace" />
+      <label for="drink">Drink</label>
+      <select id="drink">
+        <option value="Espresso">Espresso</option>
+        <option value="Americano">Americano</option>
+        <option value="Cappuccino">Cappuccino</option>
+        <option value="Latte">Latte</option>
+        <option value="Mocha">Mocha</option>
+      </select>
+      <div style="height:10px"></div>
+      <div class="row">
+        <button class="primary" id="btn-create">POST /orders</button>
+        <button id="btn-clear-create">Clear</button>
+      </div>
+      <div class="muted" style="margin-top:8px">Body example:</div>
+      <pre>{
+  "customerName": "Ada Lovelace",
+  "drink": "Latte"
+}</pre>
+      <div class="muted" id="create-status"></div>
+    </section>
+
+    <section class="card" id="list-card">
+      <h2>List all orders</h2>
+      <div class="row">
+        <button id="btn-list">GET /orders</button>
+      </div>
+      <div class="muted" style="margin-top:8px">Response:</div>
+      <pre id="list-result">[]</pre>
+    </section>
+
+    <section class="card" id="search-card">
+      <h2>Search orders by customer name</h2>
+      <label for="customerNameSearch">Customer name</label>
+      <input id="customerNameSearch" placeholder="Ada Lovelace" />
+      <div class="row" style="margin-top:10px">
+        <button id="btn-search">GET /orders?customerName=...</button>
+      </div>
+      <div class="muted" style="margin-top:8px">Response:</div>
+      <pre id="search-result"></pre>
+    </section>
+
+    <section class="card" id="get-card">
+      <h2>Get order by ID</h2>
+      <label for="orderId">Order ID</label>
+      <input id="orderId" placeholder="123" />
+      <div class="row" style="margin-top:10px">
+        <button id="btn-get">GET /orders/{id}</button>
+      </div>
+      <div class="muted" style="margin-top:8px">Response:</div>
+      <pre id="get-result"></pre>
+    </section>
+
+    <section class="card" id="patch-card">
+      <h2>Mark ready</h2>
+      <label for="orderIdReady">Order ID</label>
+      <input id="orderIdReady" placeholder="123" />
+      <div class="row" style="margin-top:10px">
+        <button id="btn-ready">PATCH /orders/{id}/ready</button>
+      </div>
+      <div class="muted" id="ready-status"></div>
+    </section>
+
+    <section class="card" id="delete-card">
+      <h2>Cancel order</h2>
+      <label for="orderIdDelete">Order ID</label>
+      <input id="orderIdDelete" placeholder="123" />
+      <div class="row" style="margin-top:10px">
+        <button class="danger" id="btn-delete">DELETE /orders/{id}</button>
+      </div>
+      <div class="muted" id="delete-status"></div>
+    </section>
+  </main>
+
+  <div class="footer">
+    Tip: Open DevTools Network tab to see requests. Some endpoints return 501 (Not Implemented) in this scaffold.
+  </div>
+
+  <script>
+    const base = '';
+
+    function setStatus(el, text, ok=true) {
+      el.textContent = text;
+      el.style.color = ok ? '#22c55e' : '#ef4444';
+    }
+    function pretty(obj) {
+      try { return JSON.stringify(obj, null, 2); } catch { return String(obj); }
+    }
+
+    // Create order
+    document.getElementById('btn-create').addEventListener('click', async () => {
+      const customerName = document.getElementById('customerName').value.trim();
+      const drink = document.getElementById('drink').value;
+      const statusEl = document.getElementById('create-status');
+      if (!customerName) { setStatus(statusEl, 'Please enter customer name', false); return; }
+      try {
+        const res = await fetch(base + '/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customerName, drink })
+        });
+        const text = await res.text();
+        setStatus(statusEl, `Status ${res.status} ${res.statusText}${text ? ' — ' + text : ''}`, res.ok);
+      } catch (e) {
+        setStatus(statusEl, e.message, false);
+      }
+    });
+    document.getElementById('btn-clear-create').addEventListener('click', () => {
+      document.getElementById('customerName').value = '';
+      document.getElementById('drink').selectedIndex = 0;
+      setStatus(document.getElementById('create-status'), 'Cleared', true);
+    });
+
+    // List orders
+    document.getElementById('btn-list').addEventListener('click', async () => {
+      const out = document.getElementById('list-result');
+      out.textContent = 'Loading...';
+      try {
+        const res = await fetch(base + '/orders');
+        const data = await res.json().catch(() => null);
+        out.textContent = pretty(data ?? await res.text());
+      } catch (e) {
+        out.textContent = e.message;
+      }
+    });
+
+    // Search orders by customer name
+    document.getElementById('btn-search').addEventListener('click', async () => {
+      const name = document.getElementById('customerNameSearch').value.trim();
+      const out = document.getElementById('search-result');
+      if (!name) { out.textContent = 'Enter a customer name'; return; }
+      out.textContent = 'Loading...';
+      try {
+        const res = await fetch(base + `/orders?customerName=${encodeURIComponent(name)}`);
+        const data = await res.json().catch(() => null);
+        out.textContent = pretty(data ?? await res.text());
+      } catch (e) {
+        out.textContent = e.message;
+      }
+    });
+
+    // Get order by id
+    document.getElementById('btn-get').addEventListener('click', async () => {
+      const id = document.getElementById('orderId').value.trim();
+      const out = document.getElementById('get-result');
+      if (!id) { out.textContent = 'Enter an id'; return; }
+      out.textContent = 'Loading...';
+      try {
+        const res = await fetch(base + `/orders/${encodeURIComponent(id)}`);
+        const data = await res.json().catch(() => null);
+        out.textContent = pretty(data ?? await res.text());
+      } catch (e) {
+        out.textContent = e.message;
+      }
+    });
+
+    // Mark ready
+    document.getElementById('btn-ready').addEventListener('click', async () => {
+      const id = document.getElementById('orderIdReady').value.trim();
+      const statusEl = document.getElementById('ready-status');
+      if (!id) { setStatus(statusEl, 'Enter an id', false); return; }
+      try {
+        const res = await fetch(base + `/orders/${encodeURIComponent(id)}/ready`, { method: 'PATCH' });
+        const text = await res.text();
+        setStatus(statusEl, `Status ${res.status} ${res.statusText}${text ? ' — ' + text : ''}`, res.ok);
+      } catch (e) {
+        setStatus(statusEl, e.message, false);
+      }
+    });
+
+    // Delete order
+    document.getElementById('btn-delete').addEventListener('click', async () => {
+      const id = document.getElementById('orderIdDelete').value.trim();
+      const statusEl = document.getElementById('delete-status');
+      if (!id) { setStatus(statusEl, 'Enter an id', false); return; }
+      try {
+        const res = await fetch(base + `/orders/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        const text = await res.text();
+        setStatus(statusEl, `Status ${res.status} ${res.statusText}${text ? ' — ' + text : ''}`, res.ok);
+      } catch (e) {
+        setStatus(statusEl, e.message, false);
+      }
+    });
+  </script>
+</body>
+</html>

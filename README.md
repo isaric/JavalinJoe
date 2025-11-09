@@ -132,10 +132,6 @@ curl -X DELETE http://localhost:7070/orders/123 -i
 
 
 ## Development hints
-- After you implement the TODOs, add unit tests with JUnit 5 (already configured in `build.gradle`).
 - Consider adding proper error handling and returning meaningful status codes/messages.
 - If you need CORS or other middleware, configure it in `Javalin.create {}`.
 
-
-## License
-MIT (or choose your preferred license).

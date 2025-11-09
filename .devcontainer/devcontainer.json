@@ -1,0 +1,33 @@
+{
+  "name": "JavalinJoe DevContainer",
+  "image": "mcr.microsoft.com/devcontainers/java:25",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "25",
+      "installMaven": false,
+      "installGradle": true,
+      "gradleVersion": "latest"
+    },
+    "ghcr.io/devcontainers-contrib/features/node-install:2": {
+      "version": "lts"
+    }
+  },
+  "postCreateCommand": "gradle --version",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-gradle",
+        "redhat.vscode-xml",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "forwardPorts": [7070],
+  "portsAttributes": {
+    "7070": {
+      "label": "JavalinJoe Web Server",
+      "onAutoForward": "openPreview"
+    }
+  }
+}

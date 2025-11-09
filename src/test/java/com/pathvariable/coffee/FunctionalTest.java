@@ -11,7 +11,7 @@ public class FunctionalTest {
     Javalin app = JavalinApp.create();
 
     @Test
-    void index() {
+    void rootRedirectsAndServesIndex() {
         JavalinTest.test(app, (_, client) ->
                 assertThat(client.get("/").code()).isEqualTo(200));
     }

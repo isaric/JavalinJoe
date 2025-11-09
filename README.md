@@ -56,7 +56,7 @@ If you prefer running from the terminal, you can either:
   - Change `Main` to:
     ```java
     public class Main {
-        public static void main(String[] args) {
+        void main(String[] args) {
             JavalinApp.create().start(7070);
         }
     }
@@ -134,4 +134,3 @@ curl -X DELETE http://localhost:7070/orders/123 -i
 ## Development hints
 - Consider adding proper error handling and returning meaningful status codes/messages.
 - If you need CORS or other middleware, configure it in `Javalin.create {}`.
-

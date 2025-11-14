@@ -32,6 +32,9 @@ JavalinJoe is a minimal Java (JDK 25) project that demonstrates a small REST API
 ```
 
 
+## Architecture diagram
+![UML Diagram](docs/uml.png)
+
 ## Build
 Use the Gradle wrapper (recommended):
 

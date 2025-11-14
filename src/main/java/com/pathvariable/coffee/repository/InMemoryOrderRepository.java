@@ -2,17 +2,15 @@ package com.pathvariable.coffee.repository;
 
 import com.pathvariable.coffee.model.Order;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 /**
  * A simple thread-safe in-memory repository for Orders.
  */
 public class InMemoryOrderRepository {
-    private final Map<String, Order> store = new ConcurrentHashMap<>();
+    private final Map<UUID, Order> store = new ConcurrentHashMap<>();
 
     public Order save(Order order) {
         store.put(order.id(), order);
@@ -21,6 +19,10 @@ public class InMemoryOrderRepository {
 
     public List<Order> findAll() {
         return new ArrayList<>(store.values());
+    }
+
+    public List<Order> findAllActive() {
+        return store.values().stream().filter(Predicate.not(Order::isReady)).toList();
     }
 
     public Optional<Order> findById(String id) {
@@ -39,11 +41,11 @@ public class InMemoryOrderRepository {
         throw new UnsupportedOperationException("findByCustomerName is not implemented yet");
     }
 
-    public Optional<Order> markReady(String id) {
+    public Optional<Order> markReady(UUID id) {
         return Optional.ofNullable(store.computeIfPresent(id, (k, v) -> new Order(v.id(), v.customerName(), v.drink(), true)));
     }
 
-    public boolean delete(String id) {
+    public boolean delete(UUID id) {
         return store.remove(id) != null;
     }
 }

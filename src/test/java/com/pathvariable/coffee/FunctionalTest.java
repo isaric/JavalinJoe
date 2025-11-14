@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class FunctionalTest {
 
-    Javalin app = JavalinApp.create();
+    Javalin app = new JavalinApp().create();
 
     @Test
     void rootRedirectsAndServesIndex() {

@@ -1,13 +1,22 @@
 package com.pathvariable.coffee;
 
+import com.pathvariable.coffee.repository.InMemoryOrderRepository;
+import com.pathvariable.coffee.request.OrderRequest;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 
-import java.util.List;
+import static com.pathvariable.coffee.model.Order.newOrder;
 
 public class JavalinApp {
 
-    public static Javalin create() {
+    private final InMemoryOrderRepository repository;
+
+    public JavalinApp() {
+        this.repository = new InMemoryOrderRepository();
+    }
+
+
+    public Javalin create() {
         return Javalin.create(cfg -> {
                     cfg.staticFiles.add(staticFiles -> {
                         staticFiles.hostedPath = "/"; // root
@@ -24,13 +33,16 @@ public class JavalinApp {
                 .post("/orders", ctx -> {
                     // Example of reading JSON (implementation to be added):
                     // var request = ctx.bodyAsClass(OrderRequest.class);
-                    ctx.status(501); // Not Implemented
+                    final var request = ctx.bodyAsClass(OrderRequest.class);
+                    request.validate();
+                    repository.save(newOrder(request.customerName(), request.drink()));
+                    ctx.status(201);
                 })
 
                 // GET /orders — See all active orders (returns JSON list)
                 // Returning an empty list as a placeholder scaffold.
                 .get("/orders", ctx -> {
-                    ctx.json(List.of());
+                    ctx.json(repository.findAllActive());
                 })
 
                 // GET /orders/{id} — Check status of one order (uses path param)

@@ -9,6 +9,11 @@
       "gradleVersion": "latest"
     }
   },
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
   "postCreateCommand": "gradle --version",
   "customizations": {
     "vscode": {

@@ -7,9 +7,6 @@
       "installMaven": false,
       "installGradle": true,
       "gradleVersion": "latest"
-    },
-    "ghcr.io/devcontainers-contrib/features/node-install:2": {
-      "version": "lts"
     }
   },
   "postCreateCommand": "gradle --version",
